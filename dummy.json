@@ -1,0 +1,131 @@
+{
+  "name" : "Kai Kang",
+  "widgets" : [
+    {
+      "id": 0,
+      "name": "Todo List",
+      "key": "todos",
+    },
+    {
+      "id": 1,
+      "name": "Comment box",
+      "key": "commentbox",
+    },
+    {
+      "id": 2,
+      "name": "Votes",
+      "key": "votes",
+    },
+    {
+      "id": 3,
+      "name": "Rich Text Editor",
+      "key": "richtexteditor",
+    },
+    {
+      "id": 4,
+      "name": "Attachments",
+      "key": "attachments",
+    },
+    {
+      "id": 5,
+      "name": "When2meet",
+      "key": "whentomeet",
+    }
+  ],
+  "tasks" : [
+    {
+      "id": 0,
+      "title": "Make this app",
+      "intro": "Make it really good",
+      "duedate": null,
+      "owner": {
+        "id": 0,
+        "name": "Kai Kang",
+      },
+      "subscribers": ["kai", "abby", "bob", "chris"],
+      "widgets": [0],
+      "todos": [
+        {
+          "content": "build basic interface",
+          "done": true,
+        },
+        {
+          "content": "Add complete task button, and dialog, save system",
+          "done": false,
+        },
+        {
+          "content": "add Subscribers with mention system",
+          "done": false,
+        },
+        {
+          "content": "implement when2meet",
+          "done": false
+        },
+        {
+          "content": "add Owner",
+          "done": true,
+        },
+        {
+          "content": "add depends on, build task tree system, isSelected",
+          "done": false,
+        },
+        {
+          "content": "build widget system",
+          "done": true,
+        },
+        {
+          "content": "add organization system",
+          "done": false,
+        },
+        {
+          "content": "optional: add notifications",
+          "done": false,
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "title": "Prepare for 16-423",
+      "intro": "learn some iOS programming",
+      "duedate": null,
+      "owner": {
+        "id": 0,
+        "name": "Kai Kang",
+      },
+      "subscribers": [0],
+      "widgets": [0, 1],
+      "todos": [
+        {
+          "content": "ask prof. about idea",
+          "done": false,
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Practice more guitar",
+      "intro": "practice strumming part",
+      "duedate": null,
+      "owner": {
+        "id": 0,
+        "name": "Kai Kang",
+      },
+      "subscribers": [0],
+      "widgets": [0, 1, 2, 3, 4, 5],
+      "todos": [],
+    },
+    {
+      "id": 3,
+      "title": "Buy stuff",
+      "intro": "practice strumming part",
+      "duedate": null,
+      "owner": {
+        "id": 0,
+        "name": "Kai Kang",
+      },
+      "subscribers": [0],
+      "widgets": [0],
+      "todos": [],
+    }
+  ]
+}
