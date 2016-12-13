@@ -277,6 +277,10 @@ class TaskStore extends EventEmitter {
     return widgets;
   }
 
+  getCurrentUser() {
+    return getUserOrRedirect();
+  }
+
   handleActions(action) {
     switch(action.type) {
       case "SELECT_TASK":

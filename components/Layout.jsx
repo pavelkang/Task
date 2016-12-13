@@ -2,6 +2,8 @@ import {Navbar, Toaster, Position, Intent} from "@blueprintjs/core";
 const TaskListView = require('./TaskListView');
 import TaskMainView from "./TaskMainView.jsx";
 import TaskStore from "../stores/TaskStore.js";
+import {Link} from "react-router";
+import MyNavbar from "./MyNavbar.jsx";
 
 const OurToaster = Toaster.create({
   position: Position.TOP,
@@ -37,6 +39,7 @@ const Layout = React.createClass({
     return {
       data: TaskStore.getData(),
       selectedTask: TaskStore.getCurrentTask(),
+      currentUser: TaskStore.getCurrentUser(),
     };
   },
 
@@ -94,20 +97,7 @@ const Layout = React.createClass({
   render() {
     return (
       <div>
-        <nav className="pt-navbar">
-          <div className="pt-navbar-group pt-align-left">
-            <div className="pt-navbar-heading">Task</div>
-            <input className="pt-input" placeholder="Search files..." type="text" />
-          </div>
-          <div className="pt-navbar-group pt-align-right">
-            <button className="pt-button pt-minimal pt-icon-home">Home</button>
-            <button className="pt-button pt-minimal pt-icon-document">Files</button>
-            <span className="pt-navbar-divider"></span>
-            <button className="pt-button pt-minimal pt-icon-user">{this.state.data ? this.state.data.name : ""}</button>
-            <button className="pt-button pt-minimal pt-icon-notifications"></button>
-            <button className="pt-button pt-minimal pt-icon-cog"></button>
-          </div>
-        </nav>
+        <MyNavbar user={this.state.currentUser} />      
         <div>
             <TaskListView data={this.state.data} style={leftstyle}/>
             <TaskMainView data={this.state.data} task={this.state.selectedTask} style={rightstyle} />
