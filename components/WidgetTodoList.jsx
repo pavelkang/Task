@@ -66,6 +66,9 @@ const WidgetTodoList = React.createClass({
 
   onKeyUp(e) {
     if (e.keyCode === 13) {
+      if (this.state.todo.length === 0) {
+        return ;
+      }
       var newTodos = this.state.todos;
       newTodos.push({
         'content': this.state.todo,

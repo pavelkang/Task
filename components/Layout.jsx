@@ -43,7 +43,7 @@ const Layout = React.createClass({
     };
   },
 
-  componentWillMount() {
+  componentDidMount() {
     TaskStore.on("change:selectedTask", () => {
       this.setState({
         selectedTask: TaskStore.getCurrentTask(),

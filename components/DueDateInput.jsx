@@ -13,7 +13,6 @@ const DueDateInput = React.createClass({
     this.props.onChange(d);
   },
 
-
   render() {
 
     var popoverContent = (
