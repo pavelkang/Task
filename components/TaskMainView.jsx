@@ -1,7 +1,6 @@
 import { EditableText, AnchorButton, Popover, PopoverInteractionKind, Intent,
   Position, Tooltip, RadioGroup, Radio, Checkbox, Alert,
   Button, Toaster} from "@blueprintjs/core";
-import { DateInput } from "@blueprintjs/datetime";
 import TaskStore from "../stores/TaskStore.js";
 import WidgetTodoList from "./WidgetTodoList";
 import WidgetCommentBox from "./WidgetCommentBox";
@@ -11,6 +10,7 @@ import WidgetAttachments from "./WidgetAttachments";
 import WidgetWhenToMeet from "./WidgetWhenToMeet";
 import * as TaskAction from "../actions/TaskAction.js";
 import NonIdealNoTaskSelectedComponent from "./NonIdealNoTaskSelectedComponent";
+import DueDateInput from "./DueDateInput";
 
 const OurToaster = Toaster.create({
   position: Position.TOP,
@@ -57,7 +57,6 @@ const TaskMainView = React.createClass({
   componentWillReceiveProps(nextProps) {
     if ((nextProps.data != this.state.data)
     || (nextProps.task != this.state.task)) {
-      console.log("update taskmainview");
       if (nextProps && nextProps.task && this.state.task) {
       }
       this._unsaved_widgets = nextProps.task ? nextProps.task.widgets : [];
@@ -220,16 +219,15 @@ const TaskMainView = React.createClass({
 
     return (
       <div>
-          <div style={this.props.style} className="pt-card pt-elevation-2">
+          <div style={this.props.style} className="pt-card pt-elevation-1">
             <div style={taskheaderstyle}>
               <center>
                 <h1 style={tasknamestyle} id="my-tasktitle">{this.state.task.title}</h1>
-                <span className="pt-button pt-minimal pt-icon-person">{this.state.task.owner}</span>
+                <Tooltip content="Owner of this task" position={Position.TOP}>
+                  <span className="pt-button pt-minimal pt-icon-person">{this.state.task.owner}</span>
+                </Tooltip>
                 <span className="pt-navbar-divider subtaskheader"></span>
-                <DateInput
-                  value={this.state.unsaved_duedate ? new Date(this.state.unsaved_duedate) : new Date()}
-                  onChange={this.onDueDateChange}
-                />
+                <DueDateInput duedate={this.state.unsaved_duedate} onChange={this.onDueDateChange}/>
                 <span className="pt-navbar-divider subtaskheader"></span>
                 <button className="pt-button pt-minimal pt-icon-globe">{this.state.task.organization}</button>
               </center>
@@ -297,7 +295,6 @@ const TaskMainView = React.createClass({
               }
           })
         }
-          <hr />
           <center>
           <Popover content={popoverContent}
                    interactionKind={PopoverInteractionKind.CLICK}

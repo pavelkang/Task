@@ -1,7 +1,10 @@
-import {Checkbox, InputGroup, Button, AnchorButton, Intent} from "@blueprintjs/core";
+import {Checkbox, InputGroup, Button, AnchorButton, Intent,
+        Collapse, Position, Popover, Menu, MenuItem, MenuDivider,
+      PopoverInteractionKind} from "@blueprintjs/core";
 import NonIdealEmptyTodoComponent from "./NonIdealEmptyTodoComponent";
 import TaskStore from "../stores/TaskStore.js";
 import TodoItemComponent from "./TodoItemComponent";
+import WidgetToggleOpenButton from "./widgetToggleOpenButton";
 
 const titlestyle = {
     position : 'absolute',
@@ -15,6 +18,7 @@ const WidgetTodoList = React.createClass({
       todos: this.props.todos ? this.props.todos : [],
       allWidgets: TaskStore.getAllWidgets(),
       todo: "",
+      isOpen: true,
     }
   },
 
@@ -26,6 +30,7 @@ const WidgetTodoList = React.createClass({
         todos: nextProps.todos ? nextProps.todos : [],
         allWidgets: TaskStore.getAllWidgets(),
         todo: this.state.todo,
+        isOpen: true,
       });
     }
   },
@@ -77,7 +82,36 @@ const WidgetTodoList = React.createClass({
     }
   },
 
+  toggleOpen() {
+    this.setState({
+      isOpen: !this.state.isOpen,
+    })
+  },
+
   render() {
+
+    const toolsMenu = (
+      <Menu>
+                      <MenuItem
+                          iconName="new-text-box"
+                          onClick={this.handleClick}
+                          text="New text box" />
+                      <MenuItem
+                          iconName="new-object"
+                          onClick={this.handleClick}
+                          text="New object" />
+                      <MenuItem
+                          iconName="new-link"
+                          onClick={this.handleClick}
+                          text="New link" />
+                      <MenuDivider />
+                      <MenuItem text="Settings..." iconName="cog" />
+      </Menu>
+
+    );
+
+
+
     var defaultEmpty = (
       <div className="taskwidget">
         <nav className="pt-navbar widgetbar">
@@ -99,11 +133,17 @@ const WidgetTodoList = React.createClass({
               <AnchorButton className="pt-button pt-minimal pt-intent-primary pt-navbar-heading" iconName="property" text="Todo List" intent={Intent.PRIMARY}></AnchorButton>
             </div>
             <div className="pt-navbar-group pt-align-right">
-              <button className="pt-button pt-minimal pt-icon-more"></button>
-              <button className="pt-button pt-minimal pt-icon-small-minus"></button>
+              <Popover content={toolsMenu}
+                     interactionKind={PopoverInteractionKind.CLICK}
+                     position={Position.LEFT_TOP}
+                     useSmartPositioning={true}>
+                     <button className="pt-button pt-minimal pt-icon-wrench"></button>
+              </Popover>
+              <WidgetToggleOpenButton toggleopen={this.toggleOpen} isOpen={this.state.isOpen}/>
               <button className="pt-button pt-minimal pt-icon-cross"></button>
             </div>
           </nav>
+          <Collapse isOpen={this.state.isOpen}>
           <div className="widgetcontent" id="todocontent">
               {
                 this.state.todos.map(function(todo, idx) {
@@ -113,7 +153,8 @@ const WidgetTodoList = React.createClass({
                 }.bind(this))
               }
           </div>
-              <InputGroup placeholder="Hit enter to add new todo" value={this.state.todo} onChange={this.onTodoChange} onKeyUp={this.onKeyUp} leftIconName="key-enter"/>
+          <InputGroup placeholder="Hit enter to add new todo" value={this.state.todo} onChange={this.onTodoChange} onKeyUp={this.onKeyUp} leftIconName="key-enter"/>
+          </Collapse>
         </div>
       )
     } else {
