@@ -114,21 +114,6 @@ const WidgetTodoList = React.createClass({
     );
 
 
-
-    var defaultEmpty = (
-      <div className="taskwidget">
-        <nav className="pt-navbar widgetbar">
-          <div className="pt-navbar-group pt-align-left">
-            <div className="pt-navbar-heading">Todo List</div>
-          </div>
-          <div className="pt-navbar-group pt-align-right">
-            <button className="pt-button pt-minimal pt-icon-cross"></button>
-          </div>
-        </nav>
-        <NonIdealEmptyTodoComponent />
-        <InputGroup placeholder="Hit enter to add new todo" value={this.state.todo} onChange={this.onTodoChange} onKeyUp={this.onKeyUp} leftIconName="key-enter"/>
-      </div>);
-    if (this.state.todos && this.state.todos.length > 0) {
       return(
         <div className="taskwidget">
           <nav className="pt-navbar widgetbar">
@@ -147,22 +132,25 @@ const WidgetTodoList = React.createClass({
             </div>
           </nav>
           <Collapse isOpen={this.state.isOpen}>
-          <div className="widgetcontent" id="todocontent">
-              {
-                this.state.todos.map(function(todo, idx) {
-                  return(
-                    <TodoItemComponent key={idx} value={idx} label={todo.content} checked={todo.done} onChange={this.onCheckTodo} onDelete={this.onTodoDelete}/>
-                  )
-                }.bind(this))
-              }
-          </div>
+            {
+              (this.state.todos && this.state.todos.length > 0) ?
+              <div className="widgetcontent" id="todocontent">
+                  {
+                    this.state.todos.map(function(todo, idx) {
+                      return(
+                        <TodoItemComponent key={idx} value={idx} label={todo.content} checked={todo.done} onChange={this.onCheckTodo} onDelete={this.onTodoDelete}/>
+                      )
+                    }.bind(this))
+                  }
+              </div>
+              :
+              <NonIdealEmptyTodoComponent />
+            }
+
           <InputGroup placeholder="Hit enter to add new todo" value={this.state.todo} onChange={this.onTodoChange} onKeyUp={this.onKeyUp} leftIconName="key-enter"/>
           </Collapse>
         </div>
-      )
-    } else {
-      return defaultEmpty;
-    }
+      );
   }
 });
 module.exports = WidgetTodoList;
