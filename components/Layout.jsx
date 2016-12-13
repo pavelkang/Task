@@ -11,7 +11,7 @@ const OurToaster = Toaster.create({
     timeout: 2000,
 });
 
-const leftwidth = 250;
+const leftwidth = 200;
 
 const leftstyle = {
   float: "left",
@@ -97,7 +97,7 @@ const Layout = React.createClass({
   render() {
     return (
       <div>
-        <MyNavbar user={this.state.currentUser} />      
+        <MyNavbar user={this.state.currentUser} />
         <div>
             <TaskListView data={this.state.data} style={leftstyle}/>
             <TaskMainView data={this.state.data} task={this.state.selectedTask} style={rightstyle} />

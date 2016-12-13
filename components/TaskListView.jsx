@@ -2,9 +2,12 @@ import { Tree, Classes, AnchorButton, Spinner, Intent} from "@blueprintjs/core";
 import * as TaskAction from "../actions/TaskAction.js";
 import CreateNewTaskDialogComponent from "./CreateNewTaskDialogComponent";
 
+const VIEWTYPE_OWN = 0;
+const VIEWTYPE_SUBSCRIBE = 1;
+
 const TaskListView = React.createClass({
 
-  renderTasks(task, idx) {    
+  renderTasks(task, idx) {
     return (
       {
         key: task.id,
@@ -22,6 +25,8 @@ const TaskListView = React.createClass({
       this.setState({
         data: nextProps.data,
         tasks: nextProps.data ? _.values(nextProps.data.tasks) : [],
+        dislogOpen: false,
+        viewType: VIEWTYPE_OWN,
       });
     }
   },
@@ -31,6 +36,7 @@ const TaskListView = React.createClass({
       dialogOpen: false,
       data: this.props.data,
       tasks: this.props.data ? _.values(this.props.data.tasks) : [],
+      viewType: VIEWTYPE_OWN,
     }
   },
 
@@ -52,6 +58,12 @@ const TaskListView = React.createClass({
     });
   },
 
+  onViewTypeChange(evt) {
+    this.setState({
+      viewType: parseInt(evt.target.value),
+    });
+  },
+
   render() {
     var x = (_.values(this.state.tasks)).map(this.renderTasks);
     return (
@@ -64,11 +76,24 @@ const TaskListView = React.createClass({
         onNodeClick={this.handleNodeClick}/>
       }
     </div>
-    <AnchorButton text="New Task" iconName="add" className="pt-intent-primary pt-fill" onClick={this.onCreateClicked}/>
-      <CreateNewTaskDialogComponent
-        isOpen={this.state.dialogOpen}
-        onCancel={this.onDialogCancel}
-      />
+    <div>
+      <center>
+      <label className="pt-label pt-inline">
+        View Tasks
+        <div className="pt-select">
+          <select onChange={this.onViewTypeChange} value={this.state.viewType}>
+            <option value="1">Owned</option>
+          <option value="2">Subscribed</option>
+          </select>
+        </div>
+    </label>
+    </center>
+      <AnchorButton text="New Task" iconName="add" className="pt-intent-primary pt-fill" onClick={this.onCreateClicked}/>
+        <CreateNewTaskDialogComponent
+          isOpen={this.state.dialogOpen}
+          onCancel={this.onDialogCancel}
+        />
+    </div>
       </div>
     )
   }
