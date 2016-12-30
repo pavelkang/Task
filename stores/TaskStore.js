@@ -1,106 +1,6 @@
 import {EventEmitter} from "events";
 import dispatcher from "./Dispatcher.js";
 
-var DATA = {
-  "name" : "Kai Kang",
-  "tasks" : [
-    {
-      "id": 0,
-      "title": "Make this app",
-      "intro": "Make it really good",
-      "duedate": null,
-      "owner": {
-        "id": 0,
-        "name": "Kai Kang",
-      },
-      "subscribers": ["kai", "abby", "bob", "chris"],
-      "widgets": [0],
-      "todos": [
-        {
-          "content": "build basic interface",
-          "done": true,
-        },
-        {
-          "content": "Add complete task button, and dialog, save system",
-          "done": false,
-        },
-        {
-          "content": "add Subscribers with mention system",
-          "done": false,
-        },
-        {
-          "content": "implement when2meet",
-          "done": false
-        },
-        {
-          "content": "add Owner",
-          "done": true,
-        },
-        {
-          "content": "add depends on, build task tree system, isSelected",
-          "done": false,
-        },
-        {
-          "content": "build widget system",
-          "done": true,
-        },
-        {
-          "content": "add organization system",
-          "done": false,
-        },
-        {
-          "content": "optional: add notifications",
-          "done": false,
-        }
-      ]
-    },
-    {
-      "id": 1,
-      "title": "Prepare for 16-423",
-      "intro": "learn some iOS programming",
-      "duedate": null,
-      "owner": {
-        "id": 0,
-        "name": "Kai Kang",
-      },
-      "subscribers": [0],
-      "widgets": [0, 1],
-      "todos": [
-        {
-          "content": "ask prof. about idea",
-          "done": false,
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "title": "Practice more guitar",
-      "intro": "practice strumming part",
-      "duedate": null,
-      "owner": {
-        "id": 0,
-        "name": "Kai Kang",
-      },
-      "subscribers": [0],
-      "widgets": [0, 1, 2, 3, 4, 5],
-      "todos": [],
-    },
-    {
-      "id": 3,
-      "title": "Buy stuff",
-      "intro": "practice strumming part",
-      "duedate": null,
-      "owner": {
-        "id": 0,
-        "name": "Kai Kang",
-      },
-      "subscribers": [0],
-      "widgets": [0],
-      "todos": [],
-    }
-  ]
-};
-
 function populateTask(key, title, userid, username, org) {
   return {
     'id': key,
@@ -172,9 +72,19 @@ class TaskStore extends EventEmitter {
       // if anything changes, reload the entire task list
         this.taskRef.on('value', function(snapshot) {
           this.data = snapshot.val();
-          console.log(this.data);
           this.emit("change:task");
-        }.bind(this))
+        }.bind(this));
+
+        firebase.database().ref("allusers/").once('value', function(snapshot) {
+          this.allUsers = snapshot.val();
+          this.emit("user:allusers");
+        }.bind(this));
+        // user data
+        firebase.database().ref("allusers/").on('value', function(snapshot) {
+          this.allUsers = snapshot.val();
+          this.emit("user:allusers");
+        }.bind(this));
+
       /*
       firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
@@ -196,6 +106,7 @@ class TaskStore extends EventEmitter {
     }.bind(this))
     this.data = null;
     this.selectedTask = null;
+    this.allUsers = [];
   }
 
   _selectTask(task) {
@@ -279,6 +190,10 @@ class TaskStore extends EventEmitter {
 
   getCurrentUser() {
     return getUserOrRedirect();
+  }
+
+  getAllUsers() {
+    return this.allUsers;
   }
 
   handleActions(action) {

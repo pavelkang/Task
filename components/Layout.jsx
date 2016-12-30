@@ -91,7 +91,6 @@ const Layout = React.createClass({
         })
       });
     });
-
   },
 
   render() {

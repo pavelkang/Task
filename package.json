@@ -5,8 +5,8 @@
   "author": "sclingtt@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "@blueprintjs/core": "^1.2",
-    "@blueprintjs/datetime": "^1.2.0",
+    "@blueprintjs/core": "^1.4",
+    "@blueprintjs/datetime": "^1.4.0",
     "babel-core": "^6.9.1",
     "babel-plugin-syntax-object-rest-spread": "^6.3.13",
     "babel-plugin-transform-react-jsx": "^6.8.0",
@@ -34,6 +34,7 @@
     "time-grunt": "^1.2.1",
     "underscore": "^1.8.3",
     "flux": "^3.1.0",
-    "react-router": "^2.0.0"
+    "react-router": "^2.0.0",
+    "fuzzaldrin-plus": "0.4.1"
   }
 }

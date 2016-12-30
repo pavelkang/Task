@@ -10,7 +10,8 @@ import WidgetAttachments from "./WidgetAttachments";
 import WidgetWhenToMeet from "./WidgetWhenToMeet";
 import * as TaskAction from "../actions/TaskAction.js";
 import NonIdealNoTaskSelectedComponent from "./NonIdealNoTaskSelectedComponent";
-import DueDateInput from "./DueDateInput";
+import DueDateInput from "./DueDateInput.jsx";
+import SubscribersInput from "./SubscribersInput.jsx";
 
 const OurToaster = Toaster.create({
   position: Position.TOP,
@@ -36,7 +37,6 @@ const tasknamestyle = {
   paddingTop: '15px',
 }
 
-
 const TaskMainView = React.createClass({
 
   getInitialState() {
@@ -46,7 +46,7 @@ const TaskMainView = React.createClass({
       task: this.props.task,
       unsaved_intro: this.props.task ? (this.props.task.intro ? this.props.task.intro : "") : "",
       unsaved_duedate: this.props.task ? this.props.task.duedate : null,
-      unsaved_widgets: this.props.task ? (this.props.task.widgets ? this.props.task.widgets : []) : [],
+      unsaved_widgets: this.props.task ? (this.props.task.widgets ? this.props.task.widgets : []) : [],      
       unsaved_child_data: {},
       allWidgets: TaskStore.getAllWidgets(),
       changeNotSaved: false,
@@ -229,9 +229,10 @@ const TaskMainView = React.createClass({
                 <span className="pt-navbar-divider subtaskheader"></span>
                 <DueDateInput duedate={this.state.unsaved_duedate} onChange={this.onDueDateChange}/>
                 <span className="pt-navbar-divider subtaskheader"></span>
+                <Tooltip content="Organization" position={Position.TOP}>
                 <button className="pt-button pt-minimal pt-icon-globe">{this.state.task.organization}</button>
+                </Tooltip>
               </center>
-
             </div>
             <div style={buttonstyle}>
               <span>{this.state.changeNotSaved ? 'Saving...' : 'Saved'}</span>
@@ -242,6 +243,7 @@ const TaskMainView = React.createClass({
               <AnchorButton text="Delete" iconName="trash" className="pt-intent-danger" onClick={this.onDelete}/>
               </span>
             </div>
+        <SubscribersInput subscribers={this.state.task.subscribers}/>
             <div className="taskbasics">
             <EditableText multiline minLines={3} maxLines={12}
               placeholder={"Say more about this task"}
