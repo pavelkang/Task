@@ -49,10 +49,19 @@ const SearchableInput = React.createClass({
     });
   },
 
-  onSubscribe(id) {
-    return () => {
-      this.props.onSubscribe(id);
+  onItemClick(id) {
+    /*
+    e.preventDefault();
+    const el = e.currentTarget;
+    console.log(el);
+    const selectedIndex = Array.prototype.indexOf.call(el.parentElement.children, el);
+    this.props.onItemClick(selectedIndex);*/
+
+    return (e) => {
+      e.preventDefault();
+      this.props.onItemClick(id);
     }
+
   },
 
   renderPopover() {
@@ -76,7 +85,7 @@ const SearchableInput = React.createClass({
               className={classes}
               key={id}
               onMouseEnter={this.handleResultHover}
-              onClick={this.onSubscribe(id)}
+              onClick={this.onItemClick(id)}
               >
                 <div>{this.props.getDisplayName(o)}</div>
               </a>

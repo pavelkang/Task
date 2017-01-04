@@ -48,11 +48,10 @@ const SubscribersInput = React.createClass({
   componentDidMount() {
     TaskStore.on('user:allusers', () => {
       var newAllUsers = TaskStore.getAllUsers();
-        console.log(newAllUsers);
       if (newAllUsers != this.state.users) {
-        this.setState(
-          users: newAllUsers,
-        );
+        this.setState({
+            users: newAllUsers,
+        });
       }
     })
   },
@@ -69,24 +68,32 @@ const SubscribersInput = React.createClass({
     });
   },
 
-
   onSubscribe(uid) {
-    console.log(uid);
+    console.log("subscribe", uid);
+    var newSubscriber = { id: uid };
+    var newSubscribers = this.state.subscribers;
+    newSubscribers.push(newSubscriber);
+    this.props.onSubscribersChange(newSubscribers);
   },
 
-  onUnsubscribe(x) {
-
+  onSubscriberRemove(id) {
+    return (e) => {
+      e.preventDefault();
+      var newSubscribers = _.reject(this.state.subscribers, (o) => {
+        return o.id === id;
+      });
+      this.props.onSubscribersChange(newSubscribers);
+    }
   },
 
   renderSubscriberTag(item, idx) {
-      // item: {uid: xx}
-      var _id = item.uid;
+      var _id = item.id;
       var targetUser = _.find(this.state.users, {'id': _id});
       if (!targetUser) {
-        return (<div key={idx}></div>)
+        return (<div key={_id}></div>)
       }
       return (
-        <Tag key={idx} intent={Intent.PRIMARY} onRemove={this.onUnsubscribe} >
+        <Tag key={_id} intent={Intent.PRIMARY} onRemove={this.onSubscriberRemove(_id)} >
           {targetUser.displayName}
         </Tag>
       );
@@ -94,24 +101,7 @@ const SubscribersInput = React.createClass({
 
   render() {
 
-    let userHintMenu = (
-      <Menu>
-                <MenuItem
-                    iconName="new-text-box"
-                    onClick={this.handleClick}
-                    text="New text box" />
-                <MenuItem
-                    iconName="new-object"
-                    onClick={this.handleClick}
-                    text="New object" />
-                <MenuItem
-                    iconName="new-link"
-                    onClick={this.handleClick}
-                    text="New link" />
-                <MenuDivider />
-                <MenuItem text="Settings..." iconName="cog" />
-    </Menu>
-    );
+    var subscribers = this.props.subscribers ? this.props.subscribers : [];
 
     return(
         <div>
@@ -119,14 +109,14 @@ const SubscribersInput = React.createClass({
           Subscribers:
           <span>
           {
-              this.state.subscribers.map(this.renderSubscriberTag)
+              subscribers.map(this.renderSubscriberTag)
           }
           </span>
           <SearchableInput
             users={this.state.users}
             getUniqueId={getUid}
             getDisplayName={getDisplayName}
-            onSubscribe={this.onSubscribe}
+            onItemClick={this.onSubscribe}
           />
         </label>
         </div>

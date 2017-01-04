@@ -35,6 +35,7 @@
     "underscore": "^1.8.3",
     "flux": "^3.1.0",
     "react-router": "^2.0.0",
-    "fuzzaldrin-plus": "0.4.1"
+    "fuzzaldrin-plus": "0.4.1",
+    "wilddog": "2.4.0"
   }
 }

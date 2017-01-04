@@ -42,11 +42,11 @@ const TaskMainView = React.createClass({
   getInitialState() {
     this._unsaved_widgets = this.props.task ? this.props.task.widgets : [];
     return {
-      data: this.props.data,
       task: this.props.task,
       unsaved_intro: this.props.task ? (this.props.task.intro ? this.props.task.intro : "") : "",
       unsaved_duedate: this.props.task ? this.props.task.duedate : null,
-      unsaved_widgets: this.props.task ? (this.props.task.widgets ? this.props.task.widgets : []) : [],      
+      unsaved_widgets: this.props.task ? (this.props.task.widgets ? this.props.task.widgets : []) : [],
+      unsaved_subscribers: this.props.task ? (this.props.task.subscribers ? this.props.task.subscribers : []) : [],
       unsaved_child_data: {},
       allWidgets: TaskStore.getAllWidgets(),
       changeNotSaved: false,
@@ -55,22 +55,35 @@ const TaskMainView = React.createClass({
 
   // need to update component?
   componentWillReceiveProps(nextProps) {
-    if ((nextProps.data != this.state.data)
-    || (nextProps.task != this.state.task)) {
-      if (nextProps && nextProps.task && this.state.task) {
-      }
+    if (nextProps.task !== this.state.task) {
       this._unsaved_widgets = nextProps.task ? nextProps.task.widgets : [];
       this.setState({
-        data: nextProps.data,
         task: nextProps.task,
         unsaved_intro: nextProps.task ? (nextProps.task.intro ? nextProps.task.intro : "") : "",
         unsaved_duedate: nextProps.task ? nextProps.task.duedate : null,
         unsaved_widgets: nextProps.task ? (nextProps.task.widgets ? nextProps.task.widgets : []) : [],
+        unsaved_subscribers: nextProps.task ? (nextProps.task.subscribers ? nextProps.task.subscribers : []) : [],
         unsaved_child_data: {},
         allWidgets: TaskStore.getAllWidgets(),
         changeNotSaved: false,
       });
     }
+  },
+
+  componentDidMount() {
+    TaskStore.on("change:saved", () => {
+      this.setState({
+        changeNotSaved: false,
+      });
+    });
+  },
+
+  _update(k, v) {
+    TaskAction.updateTask({
+      id: this.state.task.id,
+      key: k,
+      value: v,
+    });
   },
 
   onIntroChange(s) {
@@ -81,7 +94,7 @@ const TaskMainView = React.createClass({
       unsaved_intro: s,
       changeNotSaved: true,
     }, () => { // auto save
-      this._save();
+      this._update('intro', s);
     });
   },
 
@@ -93,7 +106,7 @@ const TaskMainView = React.createClass({
       unsaved_duedate: d,
       changeNotSaved: true,
     }, () => {
-      this._save();
+      this._update('duedate', d);
     });
   },
 
@@ -117,7 +130,7 @@ const TaskMainView = React.createClass({
       unsaved_widgets: this._unsaved_widgets,
       changeNotSaved: true,
     }, () => { // auto save
-        this._save();
+        this._update('widgets', this._unsaved_widgets);
     });
   },
 
@@ -157,6 +170,15 @@ const TaskMainView = React.createClass({
       });
   },
 
+  onSubscribersChange(newSubscribers) {
+    this.setState({
+      changeNotSaved: true,
+      unsaved_subscribers: newSubscribers,
+    }, () => {
+      this._update("subscribers", newSubscribers);
+    }); // auto save
+  },
+
   onFinishCancel(evt) {
     this.setState({
       openFinishAlert: false,
@@ -169,21 +191,9 @@ const TaskMainView = React.createClass({
     this.setState({
       changeNotSaved: true,
       unsaved_child_data: newChildData,
-    }, () => { // auto save
-      this._save();
-    });
-  },
-
-  _save() {
-    TaskAction.updateTask({
-      'id': this.state.task.id,
-      'task': this.state.task,
-      'intro': this.state.unsaved_intro,
-      'duedate': this.state.unsaved_duedate,
-      'widgets': this.state.unsaved_widgets,
-      'child_data': this.state.unsaved_child_data,
-      'owner': 'Kai Kang', // TODO
-    });
+    }, () => {
+      this._update(key, value);
+    }); // auto save
   },
 
   componentWillMount() {
@@ -243,7 +253,10 @@ const TaskMainView = React.createClass({
               <AnchorButton text="Delete" iconName="trash" className="pt-intent-danger" onClick={this.onDelete}/>
               </span>
             </div>
-        <SubscribersInput subscribers={this.state.task.subscribers}/>
+            <SubscribersInput
+              subscribers={this.state.task.subscribers}
+              onSubscribersChange={this.onSubscribersChange}
+            />
             <div className="taskbasics">
             <EditableText multiline minLines={3} maxLines={12}
               placeholder={"Say more about this task"}
@@ -269,7 +282,6 @@ const TaskMainView = React.createClass({
                 case 2:
                 return(
                   <div key={idx}>
-                    <hr />
                     <WidgetVote />
                   </div>
                 );

@@ -99,7 +99,7 @@ const Layout = React.createClass({
         <MyNavbar user={this.state.currentUser} />
         <div>
             <TaskListView data={this.state.data} style={leftstyle}/>
-            <TaskMainView data={this.state.data} task={this.state.selectedTask} style={rightstyle} />
+            <TaskMainView task={this.state.selectedTask} style={rightstyle} />
         </div>
       </div>
     )

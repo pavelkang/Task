@@ -24,7 +24,7 @@ const WidgetTodoList = React.createClass({
 
   // need to update component?
   componentWillReceiveProps(nextProps) {
-    if (nextProps.todos != this.state.todos) {
+    if (nextProps.todos !==  this.state.todos) {
       this.setState({
         data: nextProps.data,
         todos: nextProps.todos ? nextProps.todos : [],
