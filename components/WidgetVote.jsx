@@ -1,4 +1,5 @@
-import {InputGroup, AnchorButton, Collapse, Intent} from "@blueprintjs/core";
+import {InputGroup, AnchorButton, Collapse, Intent,
+        Radio, RadioGroup} from "@blueprintjs/core";
 import WidgetToggleOpenButton from "./WidgetToggleOpenButton";
 
 const WidgetVote = React.createClass({
@@ -6,6 +7,7 @@ const WidgetVote = React.createClass({
   getInitialState() {
     return {
       isOpen: true,
+      selectedValue: null,
     }
   },
 
@@ -15,6 +17,13 @@ const WidgetVote = React.createClass({
   toggleOpen() {
     this.setState({
       isOpen: !this.state.isOpen,
+    })
+  },
+
+  onSelectionChange(e) {
+    console.log(e.target.value);
+    this.setState({
+      selectedValue: e.target.value,
     })
   },
 
@@ -31,7 +40,15 @@ const WidgetVote = React.createClass({
           </div>
         </nav>
         <Collapse isOpen={this.state.isOpen}>
-          votes
+          <RadioGroup
+              label="Meal Choice"
+              onChange={this.onSelectionChange}
+              selectedValue={this.state.selectedValue}
+          >
+            <Radio label="Soup" value="one" />
+            <Radio label="Salad" value="two" />
+            <Radio label="Sandwich" value="three" />
+        </RadioGroup>
         </Collapse>
       </div>
     )

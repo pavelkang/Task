@@ -253,13 +253,14 @@ const TaskMainView = React.createClass({
               <AnchorButton text="Delete" iconName="trash" className="pt-intent-danger" onClick={this.onDelete}/>
               </span>
             </div>
+            {/*
             <SubscribersInput
               subscribers={this.state.task.subscribers}
               onSubscribersChange={this.onSubscribersChange}
-            />
+            /> */}
             <div className="taskbasics">
             <EditableText multiline minLines={3} maxLines={12}
-              placeholder={"Say more about this task"}
+              placeholder={"Say more about this task..."}
               value={this.state.unsaved_intro}
               onChange={this.onIntroChange}
             />
@@ -276,7 +277,7 @@ const TaskMainView = React.createClass({
                 case 1:
                 return (
                   <div key={idx}>
-                    <WidgetCommentBox />
+                    <WidgetCommentBox updateParent={this.onChildUpdate} comments={this.state.task.comments}/>
                   </div>
                 );
                 case 2:

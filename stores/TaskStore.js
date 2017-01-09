@@ -32,6 +32,20 @@ function getAllUsersRef() {
   }
 }
 
+function getUserOrRedirect() {
+  return {
+    'uid': 42,
+    'displayName': 'Kai Kang',
+  }
+}
+
+function getUserOrNull() {
+  return {
+    'uid': 42,
+    'displayName': 'Kai Kang',
+  }
+}
+
 function populateTask(key, title, userid, username, org) {
   return {
     'id': key,
@@ -46,13 +60,6 @@ function populateTask(key, title, userid, username, org) {
     'organization': org,
   };
 };
-
-function getUserOrRedirect() {
-  return {
-    'uid': 42,
-    'displayName': 'Kai Kang',
-  }
-}
 
 const widgets = [
     {
@@ -173,10 +180,14 @@ class TaskStore extends EventEmitter {
   }
 
   _finishTask(task) {
-    var refToDelete = firebase.database().ref('tasks/id/' + task.id);
-    var p = refToDelete.remove();
-    this.selectedTask = null;
-    this.emit("change:all");
+    var user = getUserOrRedirect();
+    var ref = getTaskRef(user.uid, task.id);
+    var updates = {};
+    updates['done'] = true;
+    var p = ref.update(updates);
+    p.then(() => {
+        this.emit("change:all");
+    });    
   }
 
   _createTask(task) {

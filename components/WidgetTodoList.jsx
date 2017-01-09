@@ -5,18 +5,13 @@ import NonIdealEmptyTodoComponent from "./NonIdealEmptyTodoComponent";
 import TaskStore from "../stores/TaskStore.js";
 import TodoItemComponent from "./TodoItemComponent";
 import WidgetToggleOpenButton from "./widgetToggleOpenButton";
-
-const titlestyle = {
-    position : 'absolute',
-    right: '50px',
-}
+import WidgetBar from "./WidgetBar.jsx";
 
 const WidgetTodoList = React.createClass({
   getInitialState() {
     return {
       data: this.props.data,
       todos: this.props.todos ? this.props.todos : [],
-      allWidgets: TaskStore.getAllWidgets(),
       todo: "",
       isOpen: true,
     }
@@ -28,10 +23,11 @@ const WidgetTodoList = React.createClass({
       this.setState({
         data: nextProps.data,
         todos: nextProps.todos ? nextProps.todos : [],
-        allWidgets: TaskStore.getAllWidgets(),
         todo: this.state.todo,
         isOpen: true,
       });
+      var todoList = document.getElementById('todocontent');
+      if (todoList) {todoList.scrollTop = todoList.scrollHeight;}
     }
   },
 
@@ -85,70 +81,34 @@ const WidgetTodoList = React.createClass({
     }
   },
 
-  toggleOpen() {
-    this.setState({
-      isOpen: !this.state.isOpen,
-    })
-  },
-
   render() {
-
-    const toolsMenu = (
-      <Menu>
-                      <MenuItem
-                          iconName="new-text-box"
-                          onClick={this.handleClick}
-                          text="New text box" />
-                      <MenuItem
-                          iconName="new-object"
-                          onClick={this.handleClick}
-                          text="New object" />
-                      <MenuItem
-                          iconName="new-link"
-                          onClick={this.handleClick}
-                          text="New link" />
-                      <MenuDivider />
-                      <MenuItem text="Settings..." iconName="cog" />
-      </Menu>
-
-    );
-
+    var ideal = (this.state.todos && this.state.todos.length > 0)
+    var todos =  ideal ?
+    <div className="widgetcontent" id="todocontent">
+        {
+          this.state.todos.map(function(todo, idx) {
+            return(
+              <TodoItemComponent key={idx} value={idx} label={todo.content} checked={todo.done} onChange={this.onCheckTodo} onDelete={this.onTodoDelete}/>
+            )
+          }.bind(this))
+        }
+    </div>
+    :
+    <NonIdealEmptyTodoComponent />;
+    var content = (
+    <div>
+      {todos}
+      <InputGroup placeholder="Hit enter to add new todo"
+        value={this.state.todo}
+        onChange={this.onTodoChange}
+        onKeyUp={this.onKeyUp} leftIconName="key-enter"/>
+    </div>)
 
       return(
         <div className="taskwidget">
-          <nav className="pt-navbar widgetbar">
-            <div className="pt-navbar-group pt-align-left">
-              <AnchorButton className="pt-button pt-minimal pt-intent-primary pt-navbar-heading" iconName="property" text="Todo List" intent={Intent.PRIMARY}></AnchorButton>
-            </div>
-            <div className="pt-navbar-group pt-align-right">
-              <Popover content={toolsMenu}
-                     interactionKind={PopoverInteractionKind.CLICK}
-                     position={Position.LEFT_TOP}
-                     useSmartPositioning={true}>
-                     <button className="pt-button pt-minimal pt-icon-wrench"></button>
-              </Popover>
-              <WidgetToggleOpenButton toggleopen={this.toggleOpen} isOpen={this.state.isOpen}/>
-              <button className="pt-button pt-minimal pt-icon-cross"></button>
-            </div>
-          </nav>
-          <Collapse isOpen={this.state.isOpen}>
-            {
-              (this.state.todos && this.state.todos.length > 0) ?
-              <div className="widgetcontent" id="todocontent">
-                  {
-                    this.state.todos.map(function(todo, idx) {
-                      return(
-                        <TodoItemComponent key={idx} value={idx} label={todo.content} checked={todo.done} onChange={this.onCheckTodo} onDelete={this.onTodoDelete}/>
-                      )
-                    }.bind(this))
-                  }
-              </div>
-              :
-              <NonIdealEmptyTodoComponent />
-            }
-
-          <InputGroup placeholder="Hit enter to add new todo" value={this.state.todo} onChange={this.onTodoChange} onKeyUp={this.onKeyUp} leftIconName="key-enter"/>
-          </Collapse>
+          <WidgetBar iconName="property" title="Todo List"
+            content={content}
+          />
         </div>
       );
   }
