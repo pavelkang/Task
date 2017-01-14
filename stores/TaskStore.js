@@ -122,6 +122,18 @@ class TaskStore extends EventEmitter {
           this.emit("change:task");
         }.bind(this));
 
+        // user data
+        var user = getUserOrRedirect();
+        var userRef = getUserRef(user.uid);
+        userRef.once('value', (snapshot) => {
+          this.userdata = snapshot.val();
+          this.emit("load:userdata");
+        });
+        userRef.on('value', (snapshot) => {
+          this.userdata = snapshot.val();
+          this.emit("load:userdata");
+        })
+
         var allUsersRef = getAllUsersRef();
 
         allUsersRef.once('value', function(snapshot) {
@@ -144,10 +156,24 @@ class TaskStore extends EventEmitter {
     this.emit("change:selectedTask");
   }
 
+  _updateUser(info) {
+    var updates = {};
+    updates[info.key] = info.value;
+    var user = getUserOrRedirect();
+    var userRef = getUserRef(user.uid);
+    var p = userRef.update(updates);
+    p.then(() => {
+      // TODO change saving... to saved here
+      // this.emit("load:userdata");
+      this.emit("change:saved");
+    });
+  }
+
   _updateTask(task) {
     var updates = {};
     updates[task.key] = task.value;
-    var taskRef = getTaskRef(42, task.id);
+    var user = getUserOrRedirect();
+    var taskRef = getTaskRef(user.uid, task.id);
     var p = taskRef.update(updates);
     p.then(() => {
       // TODO change saving... to saved here
@@ -187,7 +213,18 @@ class TaskStore extends EventEmitter {
     var p = ref.update(updates);
     p.then(() => {
         this.emit("change:all");
-    });    
+    });
+  }
+
+  _reopenTask(task) {
+    var user = getUserOrRedirect();
+    var ref = getTaskRef(user.uid, task.id);
+    var updates = {};
+    updates['done'] = false;
+    var p = ref.update(updates);
+    p.then(() => {
+        this.emit("change:all");
+    });
   }
 
   _createTask(task) {
@@ -248,6 +285,10 @@ class TaskStore extends EventEmitter {
     return this.selectedTask;
   }
 
+  getCurrentUserData() {
+    return this.userdata;
+  }
+
   getAllWidgets() {
     return widgets;
   }
@@ -271,11 +312,17 @@ class TaskStore extends EventEmitter {
       case "FINISH_TASK":
         this._finishTask(action.task);
         break;
+      case "REOPEN_TASK":
+        this._reopenTask(action.task);
+        break;
       case "CREATE_TASK":
         this._createTask(action.task);
         break;
       case "DELETE_TASK":
         this._deleteTask(action.task);
+        break;
+      case "UPDATE_USER":
+        this._updateUser(action.info);
         break;
     }
   }

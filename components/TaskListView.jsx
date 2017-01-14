@@ -9,7 +9,13 @@ const SECS_PER_DAY = 86400000;
 /*
   Create a different icon based on urgency of the task
 */
-function getIconName(taskDateStr) {
+function getIconName(task) {
+  if (task.done !== null) {
+    if (task.done === true) {
+      return "tick";
+    }
+  }
+  var taskDateStr = task.duedate;
   if (!taskDateStr) {
     return "time";
   }
@@ -26,7 +32,7 @@ function getIconName(taskDateStr) {
   return "box";
 }
 
-function sortTaskByDate(taskA, taskB) {
+function sortTasksByDate(taskA, taskB) {
   if (!taskB.duedate) {
     return -1;
   } else {
@@ -50,43 +56,70 @@ function sortTaskByDate(taskA, taskB) {
 
 const TaskListView = React.createClass({
 
-  renderTasks(task, idx) {
-    return (
-      {
-        key: task.id,
-        depth: 1,
-        label: task.title,
-        iconName: getIconName(task.duedate),
-        path: [idx],
-        id: task.id,
-      }
-    )
-  },
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.data != this.state.data) {
+      var tasks = nextProps.data ? _.values(nextProps.data.tasks) : [];
+      var tree = this.constructTree(tasks, nextProps.userdata);
       this.setState({
         data: nextProps.data,
-        tasks: nextProps.data ? _.values(nextProps.data.tasks) : [],
-        dislogOpen: false,
+        tasks: tasks,
+        dialogOpen: false,
+        tree: tree,
+        userdata: nextProps.userdata,
         viewType: VIEWTYPE_OWN,
       });
     }
   },
 
   getInitialState() {
+    var tasks = this.props.data ? _.values(this.props.data.tasks) : [];
+    var tree = this.constructTree(tasks, this.props.userdata);
     return {
       dialogOpen: false,
       data: this.props.data,
-      tasks: this.props.data ? _.values(this.props.data.tasks) : [],
+      tasks: tasks,
+      tree: tree,
+      userdata: this.props.userdata,
       viewType: VIEWTYPE_OWN,
     }
   },
 
+  handleNodeExpand(nodeData) {
+    nodeData.isExpanded = true;
+    nodeData.iconName = 'folder-open';
+    this.setState(this.state);
+  },
+
+  handleNodeCollapse(nodeData) {
+    nodeData.isExpanded = false;
+    nodeData.iconName = 'folder-close';
+    this.setState(this.state);
+  },
+
+  isTaskNode(node) {
+    return node.depth === 1;
+  },
+
   handleNodeClick(nodeData, _nodePath, e) {
-    TaskAction.selectTask({
-      'id': nodeData.key,
-    });
+    if (this.isTaskNode(nodeData)) { // task node
+      TaskAction.selectTask({
+        'id': nodeData.key,
+      });
+      var prevSelected = nodeData.isSelected;
+      // de-select all nodes
+      var tree = this.state.tree;
+      for (var i = 0; i < tree.length; i++) {
+        for (var j = 0; j < tree[i].childNodes.length; j++) {
+          var oldTaskNode = tree[i].childNodes[j];
+          oldTaskNode.isSelected = false;
+          tree[i].childNodes[j] = oldTaskNode;
+        }
+      }
+      nodeData.isSelected = prevSelected === null ? true : !prevSelected;
+      this.setState({
+        tree: tree,
+      })
+    }
   },
 
   onDialogCancel() {
@@ -107,17 +140,81 @@ const TaskListView = React.createClass({
     });
   },
 
+  constructTree(tasks, userdata) {
+    if (!userdata) {
+      return [];
+    }
+    var contents = [];
+    var l = userdata.folders ? userdata.folders.length : 0;
+    for (var i = 0; i < l; i++) {
+      var folderName = userdata.folders[i];
+      var tasksInThisFolder = _.where(tasks, {
+        folder: folderName,
+      });
+      var children = _.map(tasksInThisFolder, (task, j) => {
+          return {
+            key: task.id,
+            depth: 1,
+            label: task.title,
+            iconName: getIconName(task),
+            path: [i, j],
+            id: task.id,
+          }
+      });
+      children.sort(sortTasksByDate);
+      contents.push({
+        depth: 0,
+        id: i,
+        label: folderName,
+        path: [i],
+        childNodes: children,
+        isExpanded: true,
+        iconName: 'folder-open',
+      });
+    }
+    // Uncategorized
+    var noFolderTasks = [];
+    for (var j = 0; j < tasks.length; j++) {
+      var task = tasks[j];
+      if (!task.folder) {
+        noFolderTasks.push({
+          key: task.id,
+          depth: 1,
+          label: task.title,
+          iconName: getIconName(task),
+          path:[i,j],
+          id: task.id,
+        });
+      }
+    };
+    if (noFolderTasks.length === 0) {
+      return contents;
+    }
+    noFolderTasks.sort(sortTasksByDate);
+    contents.push({
+      depth: 0,
+      id: l,
+      label: "Uncategorized",
+      path: [l],
+      childNodes: noFolderTasks,
+      isExpanded: true,
+      iconName: 'folder-open',
+    });
+    return contents;
+  },
+
   render() {
-    var tasks = _.values(this.state.tasks);
-    var sortedTasks = tasks.sort(sortTaskByDate);
     return (
       <div style={this.props.style}>
       <div>
       {
         this.state.data === null ?
         <div id="tasklistspinner"><center><Spinner intent={Intent.PRIMARY}/></center></div> :
-        <Tree contents={sortedTasks.map(this.renderTasks)}
-        onNodeClick={this.handleNodeClick}/>
+        <Tree
+          contents={this.state.tree}
+          onNodeClick={this.handleNodeClick}
+          onNodeCollapse={this.handleNodeCollapse}
+          onNodeExpand={this.handleNodeExpand}/>
       }
     </div>
     <div>

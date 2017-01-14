@@ -5,7 +5,7 @@
   "author": "sclingtt@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "@blueprintjs/core": "^1.4",
+    "@blueprintjs/core": "^1.5",
     "@blueprintjs/datetime": "^1.4.0",
     "babel-core": "^6.9.1",
     "babel-plugin-syntax-object-rest-spread": "^6.3.13",

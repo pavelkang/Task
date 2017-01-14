@@ -21,6 +21,13 @@ export function finishTask(task) {
   });
 }
 
+export function reopenTask(task) {
+  dispatcher.dispatch({
+    type: "REOPEN_TASK",
+    task: task,
+  })
+}
+
 export function createTask(task) {
   dispatcher.dispatch({
     type: "CREATE_TASK",
@@ -33,4 +40,12 @@ export function deleteTask(task) {
     type: "DELETE_TASK",
     task: task,
   })
+}
+
+// IMPROVETHIS: MOVE TO UserAction.js
+export function updateUser(info) {
+  dispatcher.dispatch({
+    type: "UPDATE_USER",
+    info: info,
+  });
 }

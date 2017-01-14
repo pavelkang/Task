@@ -61,6 +61,12 @@ const Layout = React.createClass({
         data: TaskStore.getData(),
       });
     });
+    // user data (folders)
+    TaskStore.on("load:userdata", () => {
+        this.setState({
+          userdata: TaskStore.getCurrentUserData(),
+        });
+    });
 
     TaskStore.on("change:created", () => {
       this.setState({
@@ -98,8 +104,8 @@ const Layout = React.createClass({
       <div>
         <MyNavbar user={this.state.currentUser} />
         <div>
-            <TaskListView data={this.state.data} style={leftstyle}/>
-            <TaskMainView task={this.state.selectedTask} style={rightstyle} />
+            <TaskListView userdata={this.state.userdata} data={this.state.data} style={leftstyle}/>
+            <TaskMainView userdata={this.state.userdata} task={this.state.selectedTask} style={rightstyle} />
         </div>
       </div>
     )
